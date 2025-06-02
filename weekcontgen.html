@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Cont generator</title>
+    <script src="js/jquery-3.7.1.slim.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css"></style>
+    <!-- <script src="https://code.jquery.com/jquery-3.7.1.slim.js" integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script> -->
+</head>
+<body>
+    <header>
+        <img src="img/logo.png" alt="" class="logo"> <h1>Panda HGEN</h1>
+    </header>
+    <div class="head">
+        <div class="phon">Phonics</div>
+        <div class="lang">Language</div>
+    </div>
+    
+    <!-- Phonics Interface (Fixed 6 words, Emoji remains) -->
+    <div class="phonw" style="display: none;">
+        <div class="letter-inputs">
+            <input type="text" id="letter1" placeholder="Enter first letter">
+            <input type="text" id="letter2" placeholder="Enter second letter (optional)">
+        </div>
+        
+        <div class="topc">
+            <input type="text" class="word-input" placeholder="Word 1">
+            <input type="text" class="word-input" placeholder="Word 2">
+            <input type="text" class="word-input" placeholder="Word 3">
+            <input type="text" class="word-input" placeholder="Word 4">
+            <input type="text" class="word-input" placeholder="Word 5">
+            <input type="text" class="word-input" placeholder="Word 6">
+        </div>
+        <div class="emoji-btn">Select Emojis</div>
+
+<div class="icon-picker">
+    <input type="text" id="customIcon" placeholder="Type an emoji/icon">
+    <button id="addEmojiBtn">➜</button> <!-- Arrow Button -->
+            <div class="preset-icons">
+                <span>🎉</span>
+                <span>🔥</span>
+                <span>🌟</span>
+                <span>💡</span>
+                <span>🚀</span>
+            </div>
+        </div>
+
+        <div class="worksheet-options">
+            <label><input type="checkbox" id="phonicsWS"> Phonics Worksheet</label>
+            <label><input type="checkbox" id="phonicsFunWS"> Phonics for Fun Workbook</label>
+            <label><input type="checkbox" id="readingComp"> Reading Comprehension</label>
+            <input type="text" id="storyName" placeholder="Enter story name" style="display: none;">
+        </div>
+    
+        <div class="generatephbuy">Generate</div>
+        <div class="resultph"></div>
+    </div>
+    
+    <!-- Language Interface (Expandable Words + Sentence Pattern) -->
+<div class="langw" style="display: none;">
+    <div class="topc">
+        <input type="text" class="word-input" placeholder="Word 1">
+        <input type="text" class="word-input" placeholder="Word 2">
+        <input type="text" class="word-input" placeholder="Word 3">
+        <input type="text" class="word-input" placeholder="Word 4">
+        <input type="text" class="word-input" placeholder="Word 5">
+        <input type="text" class="word-input" placeholder="Word 6">
+        <input type="text" class="word-input" placeholder="Word 7">
+        <input type="text" class="word-input" placeholder="Word 8">
+        <input type="text" class="word-input" placeholder="Word 9">
+        <div class="add-word-btn">Add More Words</div>
+    </div>
+
+    <div class="sentence-pattern">
+        <label>Sentence Pattern:
+            <input type="text" id="sentencePattern" placeholder="Enter sentence pattern">
+        </label>
+    </div>
+
+    <div class="emoji-btn-lang">Select Emojis</div> <!-- Emoji Button for Language -->
+
+    <div class="generateLangBuy">Generate</div>
+    <div class="resultLang"></div>
+</div>
+    
+<div class="icon-picker">
+    <input type="text" id="customIcon" placeholder="Type an emoji/icon">
+    <button id="addEmojiBtn">➜</button> <!-- Arrow Button -->
+        <div class="preset-icons">
+            <span>🎉</span>
+            <span>🔥</span>
+            <span>✨</span>
+            <span>🌹</span>
+            <span>🚀</span>
+        </div>
+    </div>    
+    
+    <!-- Buttons -->
+    <div class="buttons">
+        <div class="copy-btn">Copy</div>
+        <div class="clear-btn">Clear Emojis</div>
+    </div>
+    <script>
+$(document).ready(function () {
+    $(".emoji-btn").off("click").on("click", function () {
+        if ($(".icon-picker").length > 1) {
+            $(".icon-picker").not(":first").remove(); // Remove duplicate instances
+        }
+        $(".icon-picker").toggle();
+    });
+
+
+    let selectedEmojis = ["🎉"]; // Default emoji
+    let phonicsWords = [];
+    let languageWords = [];
+
+    // Toggle interfaces
+    $(".phon").on("click", function () {
+        $(".phonw").show();
+        $(".langw").hide();
+    });
+
+    $(".lang").on("click", function () {
+        $(".langw").show();
+        $(".phonw").hide();
+    });
+
+    // Add words dynamically when "Add More Words" button is clicked (Language only)
+    $(".add-word-btn").on("click", function () {
+        let newInput = $("<input>").attr({
+            type: "text",
+            class: "word-input",
+            placeholder: "New Word"
+        });
+
+        $(this).before(newInput);
+    });
+
+    function updatePhonicsResult() {
+        phonicsWords = [];
+        $(".phonw .word-input").each(function () {
+            if ($(this).val().trim() !== "") {
+                phonicsWords.push($(this).val().trim());
+            }
+        });
+
+        let letter1 = $("#letter1").val().trim().toUpperCase();
+        let letter2 = $("#letter2").val().trim().toUpperCase();
+        
+        let sentence = "";
+
+        if (letter1 && letter2) {
+            sentence += `We talked about the letters ${letter1} and ${letter2}. We compared their sounds and learned their differences. `;
+        } else if (letter1) {
+            sentence += `We talked about the letter ${letter1}. We learned its sound. `;
+        }
+
+        if (phonicsWords.length > 0) {
+            sentence += `We learned these words: ${phonicsWords.join(', ')}. `;
+        }
+
+        if ($("#phonicsWS").is(":checked")) {
+            sentence += `We completed the worksheet for the letter(s) ${letter1}${letter2 ? " and " + letter2 : ""}. `;
+        }
+
+        if ($("#phonicsFunWS").is(":checked")) {
+            sentence += `We completed our phonics workbook worksheet for the letter(s) ${letter1}${letter2 ? " and " + letter2 : ""}. `;
+        }
+
+        if ($("#readingComp").is(":checked")) {
+            let story = $("#storyName").val().trim();
+            if (story) {
+                sentence += `We completed the reading comprehension worksheet for the story "${story}". `;
+            }
+        }
+
+        sentence += `Finally, we wrapped up our session with great discussions! ${selectedEmojis.join(' ')}`;
+        $(".resultph").text(sentence);
+    }
+
+    function updateLanguageResult() {
+        languageWords = [];
+        $(".langw .word-input").each(function () {
+            if ($(this).val().trim() !== "") {
+                languageWords.push($(this).val().trim());
+            }
+        });
+
+        let sentencePattern = $("#sentencePattern").val().trim();
+        
+        let sentence = "";
+        if (languageWords.length > 0) {
+            sentence += `We practiced using these words: ${languageWords.join(', ')}. `;
+        }
+
+        if (sentencePattern) {
+            sentence += `We applied this sentence pattern: "${sentencePattern}". `;
+        }
+
+        sentence += `Finally, we wrapped up our session with great discussions! ${selectedEmojis.join(' ')}`;
+        $(".resultLang").text(sentence);
+    }
+
+    $(".generatephbuy").on("click", function () {
+        updatePhonicsResult();
+    });
+
+    $(".generateLangBuy").on("click", function () {
+        updateLanguageResult();
+    });
+
+    $(".copy-btn").on("click", function () {
+        let textToCopy = $(".resultph:visible, .resultLang:visible").text();
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert("Copied to clipboard!");
+        });
+    });
+
+    $(".clear-btn").on("click", function () {
+        selectedEmojis = [];
+        $(".resultph, .resultLang").text("");
+    });
+
+    $(".preset-icons span").on("click", function () {
+        if (selectedEmojis.length < 3) {
+            selectedEmojis.push($(this).text());
+        }
+    });
+
+    $("#customIcon").on("input", function () {
+        if (selectedEmojis.length < 3) {
+            selectedEmojis.push($(this).val());
+        }
+    });
+});
+
+// Existing Phonics jQuery (Keep this)
+$(document).ready(function () {
+    let selectedEmojisPhonics = ["🎉"]; 
+
+    $(".emoji-btn").off("click").on("click", function () {
+        $(".icon-picker").toggle();
+    });
+
+    $(".preset-icons span").on("click", function () {
+        if (selectedEmojisPhonics.length < 3) {
+            selectedEmojisPhonics.push($(this).text());
+        }
+    });
+
+    $("#customIcon").on("input", function () {
+        if (selectedEmojisPhonics.length < 3) {
+            selectedEmojisPhonics.push($(this).val());
+        }
+    });
+
+    $(".clear-btn").on("click", function () {
+        selectedEmojisPhonics = [];
+    });
+
+    $(".copy-btn").on("click", function () {
+        let textToCopy = $(".resultph").text();
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert("Copied to clipboard!");
+        });
+    });
+});
+
+// NEW Language Emoji Selection (Add this after Phonics jQuery)
+$(document).ready(function () {
+    let selectedEmojisLang = ["🎉"]; 
+
+    $(".emoji-btn-lang").off("click").on("click", function () {
+        $(".icon-picker").toggle();
+    });
+
+    $(".preset-icons span").on("click", function () {
+        if (selectedEmojisLang.length < 3) {
+            selectedEmojisLang.push($(this).text());
+        }
+    });
+
+$("#addEmojiBtn").on("click", function () {
+    let customIcon = $("#customIcon").val().trim();
+    
+    if (customIcon && selectedEmojisLang.length < 3) {
+        selectedEmojisLang.push(customIcon); // Properly store emoji
+        $("#customIcon").val(""); // Clear input after adding
+        updateLanguageResult(); // Ensure it updates in the output
+    }
+});
+
+$("#customIcon").on("keypress", function (event) { 
+    if (event.which === 13) { // Check if Enter key is pressed
+        let customIcons = $(this).val().trim();
+        if (customIcons && selectedEmojisLang.length < 3) {
+            selectedEmojisLang.push(customIcons);
+            $(this).val(""); // Clear input after adding emoji
+        }
+        updateLanguageResult();
+    }
+});
+
+$(".clear-btn").on("click", function () {
+    selectedEmojisLang = []; // Reset emoji selection
+    updateLanguageResult(); // Keep the generated result intact
+});
+
+    $(".copy-btn").on("click", function () {
+        let textToCopy = $(".resultLang").text();
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert("Copied to clipboard!");
+        });
+    });
+});
+    </script>
+    <!-- <script>
+$(document).ready(function () {
+    function updateResult() {
+        let inputs = [];
+        $(".topc input").each(function () {
+            inputs.push($(this).val());
+        });
+
+        $(".resultph").text(`Your topics: ${inputs.filter(input => input !== "").join(', ')}`);
+    }
+
+    $(".topc input").on("blur", function () {
+        updateResult();
+    });
+
+    $(".generatephbuy").on("click", function () {
+        updateResult();
+    });
+});
+    </script> -->
+</body>
+</html>
